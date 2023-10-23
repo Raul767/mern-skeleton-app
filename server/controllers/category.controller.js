@@ -78,7 +78,7 @@ const update = async (req, res, next) => {
             res.json(category);
         } catch (err) {
             return res.status(400).json({
-                erroR: errorHandler.getErrorMessage(err)
+                error: errorHandler.getErrorMessage(err)
             });
         }
     });

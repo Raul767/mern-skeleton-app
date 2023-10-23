@@ -56,7 +56,7 @@ const userById = async (req, res, next, id) => {
 const read = (req, res) => {
   req.profile.hashed_password = undefined;
   req.profile.salt = undefined;
-  req.name = 'ss';
+  req.name = '';
   return res.json(req.profile);
 };
 
