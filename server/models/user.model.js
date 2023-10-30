@@ -15,14 +15,6 @@ const UserSchema = new mongoose.Schema([{
     math: [/.+\@.+\..+/, 'Please fill a valid email address'],
     required: 'Email is required'
   },
-  about: {
-    type: String,
-    trim: true,
-  },
-  photo: {
-    data: Buffer,
-    contentType: String
-  },
   created: {
     type: Date,
     default: Date.now
@@ -32,9 +24,7 @@ const UserSchema = new mongoose.Schema([{
     type: String,
     required: 'Password is required'
   },
-  salt: String,
-  following: [{ type: mongoose.Schema.ObjectId, ref: 'User'}],
-  followers: [{ type: mongoose.Schema.ObjectId, ref: 'User'}]
+  salt: String
 }]);
 
 UserSchema.virtual('password')

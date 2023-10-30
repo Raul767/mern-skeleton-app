@@ -1,10 +1,6 @@
 import User from '../models/user.model';
 import merge from 'lodash/merge';
 import errorHandler from './../helpers/dbErrorHandler';
-import formidable from 'formidable';
-import fs from 'fs';
-import { extend } from 'lodash';
-import defaultImage from './../../client/assets/images/profile-pic.png'
 
 const create = async (req, res) => {
   const user = new User(req.body);
@@ -33,11 +29,7 @@ const list = async (req, res) => {
 
 const userById = async (req, res, next, id) => {
   try {
-    let user = await User.findById({_id: id})
-    .populate('following','_id name')
-    .populate('followers','_id name')
-    .exec();
-
+    let user = await User.findById({_id: id});
     if(!user) {
       return res.status(400).json({
         error: 'User not found'
@@ -56,41 +48,27 @@ const userById = async (req, res, next, id) => {
 const read = (req, res) => {
   req.profile.hashed_password = undefined;
   req.profile.salt = undefined;
-  req.name = '';
+  req.name = 'ss';
   return res.json(req.profile);
 };
 
 const update = async (req, res, next) => {
-    const form = new formidable.IncomingForm();
-    form.keepExtension = true;
-    form.parse(req,async (err, fields, files) => {
-      try {
-        if(err) {
-          return res.status(400).json({
-            error: 'Photo could not be uploaded'
-          });
-        }
-        let user = req.profile;
-        user = extend(user, fields);
-        user.updated = Date.now();  
+  try {
+    let user = req.profile;
+    user = merge(user, req.body);
 
-        if(files.photo) {
-          user.photo.data = fs.readFileSync(files.photo.filepath);
-            user.photo.contentType = files.photo.type;
-        }
-        await user.save();
-        user.hashed_password = '';
-        user.salt = '';
-
-        res.json(user);
-      } catch (err) {
-        return res.status(400).json({
-          error: errorHandler.getErrorMessage(err)
-      });
-    }
-  });
+    user.updated = Date.now();
+    await user.save();
+    user.hashed_password = '';
+    user.salt = '';
+    res.json(user);
+  } catch (err) {
+    console.log(err);
+    return res.status(400).json({
+      error: errorHandler.getErrorMessage(err)
+    });
+  }
 };
-
 
 const remove = async (req, res, next) => {
   try {
@@ -109,84 +87,11 @@ const remove = async (req, res, next) => {
   }
 };
 
-const addFollower = async (req, res) => {
-  try{
-    const result = await User.findByIdAndUpdate(
-      req.body.followId,
-      { $push: { followers: req.body.userId } },
-      { new: true }
-    )
-    .populate('following', '_id name')
-    .populate('followers', '_id name')
-    .exec();
-  result.hashed_password = undefined;
-  result.salt = undefined;
-  res.json(result);
-  } catch(err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage(err)
-    });
-  }
-};
-
-const defaultPhoto = (req,res) => {
-  return res.sendFile(`${process.cwd()}${defaultImage}`);
-};
-
-const addFollowing = async (req,res,) => {
-  try {
-    await User.findByIdAndUpdate(
-      req.body.userId,
-      { $push: {following: req.body.followId } });
-      next();
-  } catch (err) {
-    return res.status(400).json({
-      error:errorHandler.getErrorMessage(err)
-    });
-  }
-};
-
-const removeFollower = async (req, res) => {
-  try {
-    const result = await User.findByIdAndUpdate(
-      req.body.unfollowId,
-      { $pull: { followers: req.body.userId } },
-      { new: true}
-    )
-    .populate('following', '_id name')
-    .populate('followers', '_id name')
-    .exec();
-  res.json(result);
-  } catch(err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage()
-    });
-  }
-};
-
-const removeFollowing = async (req,res,next) => {
-  try {
-    await User.findByIdAndUpdate(
-      req.body.userId,
-      { $pull: { following: req.body.unfollowId } });
-    next();
-  } catch (err) {
-    return res.status(400).json({
-      error: errorHandler.getErrorMessage()
-    });
-  }
-};
-
 export default {
   create,
   list,
   read,
   remove,
   userById,
-  update,
-  defaultPhoto,
-  addFollower,
-  addFollowing,
-  removeFollower,
-  removeFollowing
+  update
 };

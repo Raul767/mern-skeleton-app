@@ -88,13 +88,23 @@ const remove = async (req, res, next) => {
 };
 
 
-const addComment = async (req,res,) => {
+const addCommentToPost = async (req,res,) => {
   try{
-    await Post.findByIdAndUpdate(
-      req.body.postId,
-      { $push: { comment: req.body.commentId } });
-      next();
-  } catch(err){
+    const { postId, commentId } = req.body;
+
+    const post = await Post.findById(postId);
+
+    if(!post) {
+      return res.status(404).json({
+        error: 'Post not found'
+      });
+    }
+    post.comments.push(commentId);
+    await post.save();
+    return res.status(200).json({
+      message: 'Comment successfully added!'
+    });
+  } catch (err) {
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err)
     });
@@ -102,17 +112,15 @@ const addComment = async (req,res,) => {
 };
 
 
-const addLike = async (req, res) => {
+const addLikePost = async (req, res) => {
   try{
-    const result = await Post.findByIdAndUpdate(
-      req.body.likeId,
-      { $push: { likes: req.body.postId } },
+    const { userId, postId } = req.body;
+    const updateComment = await Post.findByIdAndUpdate(
+      postId,
+      { $addToSet: { likes: userId } },
       { new: true }
-      )
-      .populate('comment', '_id title')
-      .populate('like', '_id title')
-      .exec();
-      res.json(result);
+      );
+      res.json(updatedComment);
     } catch(err) {
       return res.status(400).json({
         error: errorHandler.getErrorMessage(err)
@@ -120,30 +128,15 @@ const addLike = async (req, res) => {
     }
   };
   
-  const removeComment = async (req,res,next) => {
-    try{
-      await Post.findByIdAndUpdate(
-        req.body.postId,
-        { $pull: { comment: req.body.uncommentId } });
-        next();
-    } catch (err) {
-      return res.status(400).json({
-        error:errorHandler.getErrorMessage()
-      });
-    }
-  };
-  
-  const removeLike = async (req, res) => {
+  const addunlikePost = async (req, res) => {
     try {
-      const result = await Post.findByIdAndUpdate(
-        req.body.unlikeId,
-        { $pull: { likes: req.body.postId } },
-        { new: true}
+      const { userId, postId } = req.body;
+      const updatedComment = await Post.findByIdAndUpdate(
+        postId,
+        { $pull: { likes: userId } },
+        { new: true }
       )
-      .populate('comment', '_id title')
-      .populate('like', '_id title')
-      .exec();
-    res.json(result);
+    res.json(updatedComment);
     } catch(err) {
       return res.status(400).json({
         error: errorHandler.getErrorMessage()
@@ -155,11 +148,10 @@ export default {
   create,
   list,
   read,
-  remove,
   postById,
+  remove,
   update,
-  addComment,
-  addLike,
-  removeComment,
-  removeLike
+  addCommentToPost,
+  addLikePost,
+  addunlikePost
 };
