@@ -88,6 +88,7 @@ const remove = async (req, res, next) => {
 };
 
 
+<<<<<<< HEAD
 const addCommentToPost = async (req,res,) => {
   try{
     const { postId, commentId } = req.body;
@@ -105,6 +106,15 @@ const addCommentToPost = async (req,res,) => {
       message: 'Comment successfully added!'
     });
   } catch (err) {
+=======
+const addComment = async (req,res,) => {
+  try{
+    await Post.findByIdAndUpdate(
+      req.body.postId,
+      { $push: { comment: req.body.commentId } });
+      next();
+  } catch(err){
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
     return res.status(400).json({
       error: errorHandler.getErrorMessage(err)
     });
@@ -112,6 +122,7 @@ const addCommentToPost = async (req,res,) => {
 };
 
 
+<<<<<<< HEAD
 const addLikePost = async (req, res) => {
   try{
     const { userId, postId } = req.body;
@@ -121,6 +132,19 @@ const addLikePost = async (req, res) => {
       { new: true }
       );
       res.json(updatedComment);
+=======
+const addLike = async (req, res) => {
+  try{
+    const result = await Post.findByIdAndUpdate(
+      req.body.likeId,
+      { $push: { likes: req.body.postId } },
+      { new: true }
+      )
+      .populate('comment', '_id title')
+      .populate('like', '_id title')
+      .exec();
+      res.json(result);
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
     } catch(err) {
       return res.status(400).json({
         error: errorHandler.getErrorMessage(err)
@@ -128,6 +152,7 @@ const addLikePost = async (req, res) => {
     }
   };
   
+<<<<<<< HEAD
   const addunlikePost = async (req, res) => {
     try {
       const { userId, postId } = req.body;
@@ -137,6 +162,32 @@ const addLikePost = async (req, res) => {
         { new: true }
       )
     res.json(updatedComment);
+=======
+  const removeComment = async (req,res,next) => {
+    try{
+      await Post.findByIdAndUpdate(
+        req.body.postId,
+        { $pull: { comment: req.body.uncommentId } });
+        next();
+    } catch (err) {
+      return res.status(400).json({
+        error:errorHandler.getErrorMessage()
+      });
+    }
+  };
+  
+  const removeLike = async (req, res) => {
+    try {
+      const result = await Post.findByIdAndUpdate(
+        req.body.unlikeId,
+        { $pull: { likes: req.body.postId } },
+        { new: true}
+      )
+      .populate('comment', '_id title')
+      .populate('like', '_id title')
+      .exec();
+    res.json(result);
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
     } catch(err) {
       return res.status(400).json({
         error: errorHandler.getErrorMessage()
@@ -148,10 +199,20 @@ export default {
   create,
   list,
   read,
+<<<<<<< HEAD
   postById,
   remove,
   update,
   addCommentToPost,
   addLikePost,
   addunlikePost
+=======
+  remove,
+  postById,
+  update,
+  addComment,
+  addLike,
+  removeComment,
+  removeLike
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
 };

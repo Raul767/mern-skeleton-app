@@ -20,7 +20,10 @@ import devBundle from './devBundle';
 // Routes
 import authRoutes from './routes/auth.routes';
 import userRoutes from './routes/user.routes';
+<<<<<<< HEAD
 import postRoutes from './routes/post.routes';
+=======
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
 import commentRoutes from './routes/comment.routes';
 
 import Template from './../template';
@@ -40,7 +43,10 @@ app.use(cors());
 app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')));
 app.use('/', authRoutes);
 app.use('/', userRoutes);
+<<<<<<< HEAD
 app.use('/', postRoutes);
+=======
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
 app.use('/', commentRoutes);
 
 app.get('*', (req, res) => {

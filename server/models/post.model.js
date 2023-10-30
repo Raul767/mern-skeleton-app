@@ -31,6 +31,7 @@ const PostSchema = new mongoose.Schema([{
 
     salt: String,
     
+<<<<<<< HEAD
     comments: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -39,6 +40,10 @@ const PostSchema = new mongoose.Schema([{
     ],
 
     likes: [{type: mongoose.Schema.ObjectId, ref:'User'}],
+=======
+    like: [{type: mongoose.Schema.ObjectId, ref:'Post'}],
+    comment: [{type: mongoose.Schema.ObjectId, ref:'Post'}]
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
 }]);
 
 export default mongoose.model('Post', PostSchema);

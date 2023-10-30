@@ -19,7 +19,11 @@ const create = async(req, res) => {
 
 const list = async(req, res) => {
     try{
+<<<<<<< HEAD
         let comments = await Comment.find().select('description user updated created');
+=======
+        let comments = await Comment.find().select('comment updated created');
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
         res.json(comments);
     } catch(err) {
         return res.status(400).json({
@@ -31,8 +35,13 @@ const list = async(req, res) => {
 const commentById = async (req, res, next, id) => {
     try{
         let comment = await Comment.findById({_id: id}) 
+<<<<<<< HEAD
         .populate('following','_id ')
         .populate('followers', '_id ')
+=======
+        .populate('like','_id like')
+        .populate('post', '_id title')
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
         .populate('user', '_id name')
         exec();
 
@@ -46,7 +55,11 @@ const commentById = async (req, res, next, id) => {
     } catch(err) {
         console.log(err);
         return res.status(400).json({
+<<<<<<< HEAD
             error: "Could not retrieve comment"
+=======
+            error: "Could not retrieve post"
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
         });
     }
 };
@@ -86,6 +99,7 @@ const remove = async(req, res, next) => {
     }
 };
 
+<<<<<<< HEAD
 const addlikeComment = async (req, res) => {
     try {
       const { userId, commentId } = req.body;
@@ -123,6 +137,44 @@ const addlikeComment = async (req, res) => {
     }
   };
  
+=======
+const addLike = async (req, res) => {
+    try {
+        const result = await Comment.findByIdAndUpdate(
+            req.body.likeId,
+            { $push: {likes: req.body.commentId}},
+            { new: true }
+        )
+        .populate('comment', '_id comment')
+        .populate('like', '_id like')
+        .exec();
+        res.json(result);
+    } catch(err) {
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage(err)
+        });
+    }
+};
+
+const removeLike = async(req, res) => {
+try{
+    const result = await Comment.findByIdAndUpdate(
+        req.body.unlikeId,
+        { $pull: { likes: req.body.commentId} },
+        { new: true }
+    )
+    .populate('comment', '_id comment')
+    .populate('like', '_id like')
+    .exec();
+    res.json(result);
+    } catch(err){
+        return res.status(400).json({
+            error: errorHandler.getErrorMessage()
+        });
+    }
+};
+
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
 export default{
     create,
     list,
@@ -130,6 +182,12 @@ export default{
     remove,
     commentById,
     update,
+<<<<<<< HEAD
     addlikeComment,
     addunlikeComment
   };
+=======
+    addLike,
+    removeLike
+}
+>>>>>>> 1bcdf7efad52f42023c02719a5f7f3af6e46d9c2
